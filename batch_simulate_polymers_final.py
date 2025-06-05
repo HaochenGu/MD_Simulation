@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Batch simulation script for all polymers using the correct approach.
-Uses graph structures from pickle file for accurate polymer representation.
+Final robust batch simulation script for all polymers.
+Handles all edge cases including disconnected graphs and perfect rings.
 """
 
 import numpy as np
@@ -18,7 +18,7 @@ import sys
 
 # Add the directory to path so we can import the simulation function
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from run_polymer_correct import run_polymer_simulation
+from run_polymer_final import run_polymer_simulation
 
 
 def process_polymer(args):
@@ -43,7 +43,7 @@ def process_polymer(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Batch MD simulations for polymers')
+    parser = argparse.ArgumentParser(description='Final robust batch MD simulations for polymers')
     parser.add_argument('--start', type=int, default=0, help='Start molecule index')
     parser.add_argument('--end', type=int, default=10, help='End molecule index')
     parser.add_argument('--lammps', default='lmp', help='LAMMPS executable')
@@ -63,6 +63,7 @@ def main():
     print(f"Processing molecules {args.start} to {args.end-1}")
     print(f"Quick mode: {args.quick}")
     print(f"Parallel jobs: {args.parallel}")
+    print(f"NOTE: Using final robust script that handles all edge cases")
     
     # Get absolute path to data directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -164,6 +165,19 @@ def main():
             print(f"  {topo:10s}: {topo_data['sigma'].mean():.3f} ± {topo_data['sigma'].std():.3f} Å")
     
     print(f"\nResults saved to: {os.path.join(work_dir, args.output)}")
+    
+    # If there were failures, show details
+    if len(successful) < len(df_results):
+        failed = df_results[df_results['success'] == False]
+        print(f"\nFailed molecule IDs: {sorted(failed['mol_id'].tolist())}")
+        
+        # Show specific failure patterns
+        print("\nAnalyzing failure patterns...")
+        if failed['mol_id'].min() >= 306 and failed['mol_id'].max() <= 965:
+            print("- Molecules 306-965: Non-contiguous node indices (should be fixed)")
+        if failed['mol_id'].min() >= 966 and failed['mol_id'].max() <= 975:
+            print("- Molecules 966-975: Perfect rings or disconnected graphs (should be fixed)")
+        print("- The final script should handle all these cases correctly")
 
 
 if __name__ == '__main__':

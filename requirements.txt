@@ -1,0 +1,14 @@
+# Core dependencies for polymer MD simulations
+numpy>=1.19.0
+pandas>=1.2.0
+networkx>=2.5
+matplotlib>=3.3.0
+scipy>=1.6.0
+
+# For Jupyter notebook support (optional)
+jupyter>=1.0.0
+ipykernel>=5.3.4
+notebook>=6.1.0
+
+# Additional utilities
+tqdm>=4.50.0  # Progress bars for batch processing
